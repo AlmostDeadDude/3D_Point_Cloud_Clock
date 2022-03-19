@@ -1,6 +1,9 @@
 let scene, camera, renderer, controls, hoursGroup, minutesGroup, secondsGroup, dotsGroup;
 const container = document.querySelector('#container');
-const shuffleBtn = document.getElementById('shuffleBtn');
+const colorInput = document.getElementById('color');
+const backgroundColorInput = document.getElementById('color2');
+const sizeInput = document.getElementById('size');
+const spreadInput = document.getElementById('spread');
 
 const clock = new THREE.Clock();
 let stats;
@@ -42,6 +45,32 @@ const c = {
     sec: tempTime.getSeconds()
 }
 
+//user controlled parameters, do not actually need them as separate variable but might be nice to have later
+let spreadDist = spreadInput.value
+let pointSize = sizeInput.value
+let pointColor = colorInput.value
+let backgroundColor = backgroundColorInput.value
+
+sizeInput.addEventListener('input', () => {
+    pointSize = sizeInput.value
+    pMat.size = pointSize
+})
+
+spreadInput.addEventListener('input', () => {
+    spreadDist = spreadInput.value
+})
+
+colorInput.addEventListener('input', () => {
+    pointColor = colorInput.value
+    pMat.color.set(pointColor)
+
+})
+
+backgroundColorInput.addEventListener('input', () => {
+    backgroundColor = backgroundColorInput.value
+    scene.background.set(backgroundColor)
+})
+
 init()
 animate()
 
@@ -51,10 +80,10 @@ function init() {
     var h = container.offsetHeight;
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xfaebd7);
+    scene.background = new THREE.Color(backgroundColor);
 
     camera = new THREE.PerspectiveCamera(45, w / h, 1, 50000);
-    camera.position.set(0, 0, 15000);
+    camera.position.set(0, 0, 10000);
     camera.lookAt(scene.position);
 
     // const light = new THREE.AmbientLight(0xFFFFFF, 1);
@@ -65,8 +94,8 @@ function init() {
     secondsGroup = new THREE.Group();
     dotsGroup = new THREE.Group();
 
-    // pMat.color = new THREE.Color(0xf0ff1a)
-    pMat.size = 50
+    pMat.color.set(pointColor)
+    pMat.size = pointSize
     pMat.map = sprite
     pMat.alphaTest = 0.3;
     pMat.transparent = true;
@@ -79,13 +108,14 @@ function init() {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(w, h);
     renderer.autoClear = false;
+    renderer.domElement.id = 'mainCanvas'
     container.appendChild(renderer.domElement);
 
     controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-    const grid = new THREE.GridHelper(30000, 30);
-    grid.rotation.x = -Math.PI / 2;
-    scene.add(grid);
+    // const grid = new THREE.GridHelper(30000, 30);
+    // grid.rotation.x = -Math.PI / 2;
+    // scene.add(grid);
 
     // const grid2 = new THREE.GridHelper(30000, 30);
     // scene.add(grid2);
@@ -95,10 +125,10 @@ function init() {
     // scene.add(grid3)
 
     stats = new Stats();
+    stats.domElement.style.cssText = 'position:absolute;bottom:0px;left:0px;';
     container.appendChild(stats.dom);
 
     window.addEventListener('resize', onWindowResize);
-    shuffleBtn.addEventListener('click', updateClock)
 }
 
 function onWindowResize() {
@@ -165,7 +195,6 @@ function updateClock() {
                 firstStage = []
                 //if movement was not yet defined - define it
                 //take output positions number and create the vector like [dx dy dz dx dy dz...] with matching length where deltas are all random numbers in certain interval. Those are the directions we then apply to the input. Input's length can be matched to the output's here or in the second stage. 
-                let spreadDist = 250
                 for (let i = 0; i < secondsGroup.children[1].geometry.attributes.position.array.length; i++) {
                     firstStage.push(spreadDist * Math.random() - spreadDist / 2)
                 }
@@ -353,6 +382,10 @@ function addLetter(letter, ind) {
             minutesGroup.position.setX(-1000)
             secondsGroup.position.setX(2500)
 
+            hoursGroup.position.setY(-700)
+            minutesGroup.position.setY(-700)
+            secondsGroup.position.setY(-700)
+
             hardSetClock()
 
             scene.add(hoursGroup)
@@ -396,6 +429,8 @@ function addSemicolons() {
     dotsGroup.add(cubePoints2)
     dotsGroup.add(cubePoints3)
     dotsGroup.add(cubePoints4)
+
+    dotsGroup.position.setY(-700)
 
     scene.add(dotsGroup)
 }

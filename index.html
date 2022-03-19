@@ -14,9 +14,25 @@
     <title>Letters</title>
 </head>
 <body>
-    color, size, spread of points and maybe something else can be controlled
     <div id="container"></div>
-    <button id="shuffleBtn">Shuffle</button>
+    <div id="tools">
+        <div>
+            <label for="size">Size</label>
+            <input type="range" name="size" id="size" min="20" max="200" step="10" value="70">
+        </div>
+        <div>
+            <label for="spread">Spread</label>
+            <input type="range" name="spread" id="spread" min="0" max="1000" step="50" value="250">
+        </div>
+        <div>
+            <label for="color">Color</label>
+            <input type="color" name="color" id="color" value="#f9f34d">
+        </div>
+        <div>
+            <label for="color2">Background</label>
+            <input type="color" name="color2" id="color2" value="#35133f">
+        </div>
+    </div>
     <script src="js/script_time.js"></script>
 </body>
 </html>
