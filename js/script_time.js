@@ -55,30 +55,55 @@ const c = {
 }
 
 //user controlled parameters
+spreadInput.value = localStorage.getItem('POINTCLOUDCLOCK_spread') || 250
+sizeInput.value = localStorage.getItem('POINTCLOUDCLOCK_size') || 70
+colorInput.value = localStorage.getItem('POINTCLOUDCLOCK_color') || '#f9f34d'
+backgroundColorInput.value = localStorage.getItem('POINTCLOUDCLOCK_backgroundColor') || '#35133f'
+
+
 let spreadDist = spreadInput.value
 let pointSize = sizeInput.value
 let pointColor = colorInput.value
 let backgroundColor = backgroundColorInput.value
 
-sizeInput.addEventListener('input', () => {
+sizeInput.addEventListener('input', updateS)
+spreadInput.addEventListener('input', updateSp)
+colorInput.addEventListener('input', updateC)
+backgroundColorInput.addEventListener('input', updateBGC)
+
+function updateS() {
     pointSize = sizeInput.value
     pMat.size = pointSize
-})
+    localStorage.setItem('POINTCLOUDCLOCK_size', pointSize)
+}
 
-spreadInput.addEventListener('input', () => {
+function updateSp() {
     spreadDist = spreadInput.value
-})
+    localStorage.setItem('POINTCLOUDCLOCK_spread', spreadDist)
+}
 
-colorInput.addEventListener('input', () => {
+function updateC() {
     pointColor = colorInput.value
     pMat.color.set(pointColor)
     sMat.color.set(pointColor)
+    localStorage.setItem('POINTCLOUDCLOCK_color', pointColor)
+}
 
-})
-
-backgroundColorInput.addEventListener('input', () => {
+function updateBGC() {
     backgroundColor = backgroundColorInput.value
     scene.background.set(backgroundColor)
+    localStorage.setItem('POINTCLOUDCLOCK_backgroundColor', backgroundColor)
+}
+
+refreshBtn.addEventListener('click', () => {
+    sizeInput.value = 70
+    updateS()
+    spreadInput.value = 250
+    updateSp()
+    colorInput.value = '#f9f34d'
+    updateC()
+    backgroundColorInput.value = '#35133f'
+    updateBGC()
 })
 
 init()
@@ -210,16 +235,18 @@ function render() {
 
     controls.update();
 
-    raycaster.setFromCamera(pointer, camera);
-    intersects = raycaster.intersectObjects([hoursGroup, minutesGroup, secondsGroup, dotsGroup], true);
-    intersection = (intersects.length) > 0 ? intersects[0] : null;
-    if (toggle > 0.02 && intersection !== null) {
+    if (!STATUS) {
+        raycaster.setFromCamera(pointer, camera);
+        intersects = raycaster.intersectObjects([hoursGroup, minutesGroup, secondsGroup, dotsGroup], true);
+        intersection = (intersects.length) > 0 ? intersects[0] : null;
+        if (toggle > 0.02 && intersection !== null) {
 
-        spheres[spheresIndex].position.copy(intersection.point);
-        spheres[spheresIndex].scale.set(pointSize * 2, pointSize * 2, pointSize * 2);
-        spheresIndex = (spheresIndex + 1) % spheres.length;
+            spheres[spheresIndex].position.copy(intersection.point);
+            spheres[spheresIndex].scale.set(pointSize * 2, pointSize * 2, pointSize * 2);
+            spheresIndex = (spheresIndex + 1) % spheres.length;
 
-        toggle = 0;
+            toggle = 0;
+        }
     }
 
     for (let i = 0; i < spheres.length; i++) {

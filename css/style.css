@@ -73,3 +73,29 @@ body {
 #tools #spread {
   cursor: pointer;
 }
+
+#refreshStyle {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: #001f34;
+  cursor: pointer;
+  transition: animation 1s ease-in;
+}
+
+#refreshStyle:hover {
+  transform: scale(1.1);
+}
+
+#refreshStyle.clicked {
+  animation: rot360 0.5s ease-in-out;
+}
+
+@keyframes rot360 {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
