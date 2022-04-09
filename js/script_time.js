@@ -1,4 +1,5 @@
 let scene, camera, renderer, controls, hoursGroup, minutesGroup, secondsGroup, dotsGroup;
+
 const container = document.querySelector('#container');
 const colorInput = document.getElementById('color');
 const backgroundColorInput = document.getElementById('color2');
@@ -7,6 +8,8 @@ const spreadInput = document.getElementById('spread');
 
 const clock = new THREE.Clock();
 let stats;
+const mouse = [.5, .5];
+let STATUS = false
 
 // const sprite = createCircleTexture();
 // const sprite = new THREE.TextureLoader().load("img/disc_cat.png");
@@ -112,6 +115,9 @@ function init() {
     container.appendChild(renderer.domElement);
 
     controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enablePan = false;
+    controls.enableRotate = false;
+    controls.maxDistance = 26494;
 
     // const grid = new THREE.GridHelper(30000, 30);
     // grid.rotation.x = -Math.PI / 2;
@@ -128,6 +134,14 @@ function init() {
     stats.domElement.style.cssText = 'position:absolute;bottom:0px;left:0px;';
     container.appendChild(stats.dom);
 
+    container.addEventListener('mousedown', () => {
+        STATUS = true
+    })
+    window.addEventListener('mouseup', () => {
+        STATUS = false
+    })
+
+    window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('resize', onWindowResize);
 }
 
@@ -139,22 +153,37 @@ function onWindowResize() {
     camera.lookAt(scene.position);
 
     renderer.setSize(container.offsetWidth, container.offsetHeight);
+}
 
+function onMouseMove(ev) {
+    if (STATUS) {
+        mouse[0] = ev.clientX / window.innerWidth;
+        mouse[1] = ev.clientY / window.innerHeight;
+    }
 }
 
 function animate() {
 
     requestAnimationFrame(animate);
     render();
-    stats.update();
 }
 
 function render() {
     // let delta = 10 * clock.getDelta();
     // scene.rotation.y += -0.02 * delta;
     updateClock()
+
+    // console.log(controls)
+
+    camera.position.x = Math.sin(1 * Math.PI * (mouse[0] - .5)) * camera.position.z;
+    camera.position.y = Math.sin(1 * Math.PI * (mouse[1] - .5)) * camera.position.z;
+    camera.lookAt(scene.position);
+
     controls.update();
+
     renderer.render(scene, camera);
+
+    stats.update();
 }
 
 function createCircleTexture() {
@@ -178,8 +207,6 @@ function createCircleTexture() {
     // return a texture made from the canvas
     return texture;
 }
-
-
 
 function updateClock() {
     if (LOADED) {
@@ -378,9 +405,9 @@ function addLetter(letter, ind) {
             });
             secondsGroup.children[1].position.setX(1300)
 
-            hoursGroup.position.setX(-4500)
-            minutesGroup.position.setX(-1000)
-            secondsGroup.position.setX(2500)
+            hoursGroup.position.setX(-5000)
+            minutesGroup.position.setX(-1500)
+            secondsGroup.position.setX(2000)
 
             hoursGroup.position.setY(-700)
             minutesGroup.position.setY(-700)
@@ -417,13 +444,13 @@ function addSemicolons() {
     dotsGeo.setAttribute('InitialPosition', new THREE.BufferAttribute(new Float32Array(positions), 3))
 
     let cubePoints = new THREE.Points(dotsGeo, pMat)
-    cubePoints.position.set(-1500, 1000, mesh_size / 2)
+    cubePoints.position.set(-2000, 1000, mesh_size / 2)
     let cubePoints2 = cubePoints.clone()
-    cubePoints.position.set(-1500, 500, mesh_size / 2)
+    cubePoints.position.set(-2000, 500, mesh_size / 2)
     let cubePoints3 = cubePoints.clone()
-    cubePoints.position.set(2000, 1000, mesh_size / 2)
+    cubePoints.position.set(1500, 1000, mesh_size / 2)
     let cubePoints4 = cubePoints.clone()
-    cubePoints.position.set(2000, 500, mesh_size / 2)
+    cubePoints.position.set(1500, 500, mesh_size / 2)
 
     dotsGroup.add(cubePoints)
     dotsGroup.add(cubePoints2)

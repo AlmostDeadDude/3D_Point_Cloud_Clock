@@ -50,6 +50,11 @@ body {
   box-shadow: -7px 7px 14px #dcdcdc, 7px -7px 14px #ffffff;
 }
 
+#tools div:hover {
+  transform: scale(1.02);
+  filter: brightness(0.98);
+}
+
 #tools div label {
   margin-bottom: 8px;
 }
