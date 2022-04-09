@@ -1,4 +1,9 @@
 let scene, camera, renderer, controls, hoursGroup, minutesGroup, secondsGroup, dotsGroup;
+let raycaster, intersects, pointer;
+let spheres = [];
+let toggle = 0;
+let intersection = null;
+let spheresIndex = 0;
 
 const container = document.querySelector('#container');
 const colorInput = document.getElementById('color');
@@ -17,6 +22,7 @@ let STATUS = false
 // const sprite = new THREE.TextureLoader().load("img/disc_thicc.png");
 const sprite = new THREE.TextureLoader().load("img/clock_face.svg");
 const pMat = new THREE.PointsMaterial()
+const sMat = new THREE.SpriteMaterial()
 
 // sprite.anisotropy = 8;
 // sprite.magFilter = THREE.NearestFilter;
@@ -48,7 +54,7 @@ const c = {
     sec: tempTime.getSeconds()
 }
 
-//user controlled parameters, do not actually need them as separate variable but might be nice to have later
+//user controlled parameters
 let spreadDist = spreadInput.value
 let pointSize = sizeInput.value
 let pointColor = colorInput.value
@@ -66,6 +72,7 @@ spreadInput.addEventListener('input', () => {
 colorInput.addEventListener('input', () => {
     pointColor = colorInput.value
     pMat.color.set(pointColor)
+    sMat.color.set(pointColor)
 
 })
 
@@ -130,6 +137,22 @@ function init() {
     // grid3.rotation.z = -Math.PI / 2;
     // scene.add(grid3)
 
+    sMat.color.set(pointColor)
+    sMat.map = sprite
+    sMat.transparent = true
+    sMat.alphaTest = 0.3;
+
+    for (let i = 0; i < 40; i++) {
+
+        const sphere = new THREE.Sprite(sMat);
+        scene.add(sphere);
+        spheres.push(sphere);
+    }
+
+    raycaster = new THREE.Raycaster();
+    raycaster.params.Points.threshold = pointSize;
+    pointer = new THREE.Vector2(1, 1);
+
     stats = new Stats();
     stats.domElement.style.cssText = 'position:absolute;bottom:0px;left:0px;';
     container.appendChild(stats.dom);
@@ -141,6 +164,7 @@ function init() {
         STATUS = false
     })
 
+    renderer.domElement.addEventListener('pointermove', onPointerMove);
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('resize', onWindowResize);
 }
@@ -162,6 +186,11 @@ function onMouseMove(ev) {
     }
 }
 
+function onPointerMove(event) {
+    pointer.x = (event.offsetX / container.offsetWidth) * 2 - 1;
+    pointer.y = -(event.offsetY / container.offsetHeight) * 2 + 1;
+}
+
 function animate() {
 
     requestAnimationFrame(animate);
@@ -180,6 +209,32 @@ function render() {
     camera.lookAt(scene.position);
 
     controls.update();
+
+    raycaster.setFromCamera(pointer, camera);
+    intersects = raycaster.intersectObjects([hoursGroup, minutesGroup, secondsGroup, dotsGroup], true);
+    intersection = (intersects.length) > 0 ? intersects[0] : null;
+    if (toggle > 0.02 && intersection !== null) {
+
+        spheres[spheresIndex].position.copy(intersection.point);
+        spheres[spheresIndex].scale.set(pointSize * 2, pointSize * 2, pointSize * 2);
+        spheresIndex = (spheresIndex + 1) % spheres.length;
+
+        toggle = 0;
+    }
+
+    for (let i = 0; i < spheres.length; i++) {
+
+        const sphere = spheres[i];
+        sphere.scale.multiplyScalar(0.98);
+        sphere.scale.clampScalar(0.01, pointSize * 2);
+    }
+
+    toggle += clock.getDelta();
+    // if (intersects.length > 0) {
+    //     intersects.forEach(intersect => {
+
+    //     })
+    // }
 
     renderer.render(scene, camera);
 
