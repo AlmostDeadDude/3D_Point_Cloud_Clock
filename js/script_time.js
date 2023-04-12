@@ -12,7 +12,7 @@ const sizeInput = document.getElementById('size');
 const spreadInput = document.getElementById('spread');
 
 const clock = new THREE.Clock();
-let stats;
+// let stats;
 const mouse = [.5, .5];
 let STATUS = false
 
@@ -178,9 +178,9 @@ function init() {
     raycaster.params.Points.threshold = pointSize;
     pointer = new THREE.Vector2(1, 1);
 
-    stats = new Stats();
-    stats.domElement.style.cssText = 'position:absolute;bottom:0px;left:0px;';
-    container.appendChild(stats.dom);
+    // stats = new Stats();
+    // stats.domElement.style.cssText = 'position:absolute;bottom:0px;left:0px;';
+    // container.appendChild(stats.dom);
 
     container.addEventListener('mousedown', () => {
         STATUS = true
@@ -265,7 +265,7 @@ function render() {
 
     renderer.render(scene, camera);
 
-    stats.update();
+    // stats.update();
 }
 
 function createCircleTexture() {
